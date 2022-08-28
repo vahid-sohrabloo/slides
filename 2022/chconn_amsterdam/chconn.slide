@@ -1,0 +1,329 @@
+# chconn
+Making a high performance generic library
+00:00 31 Aug 2022
+Tags: golang, clickhouse, chconn, generic
+
+Vahid Sohbraloo
+chconn
+https://github.com/vahid-sohrabloo/chconn
+
+: Author of chconn
+: chconn is the high performance ClickHouse driver
+
+## What is ClickHouse
+The Open Source OLAP database management system.
+* Blazing fast
+* Linearly scalable
+* Fault tolerant
+* ...
+
+
+## Why new a driver
+* Looking for Time Series database
+* Clickhouse is very fast
+* Native driver was really slow
+
+## ClickHouse Protocol Interface
+- HTTP interface
+- gRPC interface
+- MySQL interface
+- PostgreSQL Interface
+- **Native TCP interface**
+
+
+## ClickHouse Native protocol
+* Streaming TCP interface
+* Columnar
+* **Use Little Endian**
+* Use CityHash (the old version)
+* LZ4 and ZSTD compression
+* 
+## Document of TCP interface
+ Haa...
+ ```
+ native ClickHouse protocol does not have formal specification yet,
+ but it can be reverse-engineered from ClickHouse source code
+ and/or by intercepting and analyzing TCP traffic.
+```
+*After I started, some documents were added.
+It is not complete and is not updated in every version *
+
+https://clickhouse.com/docs/en/native-protocol/basics
+
+
+.image go1.webm
+
+
+
+## Before start
+* See and use pgx (config parser and pool)
+* Review python and golang library library
+* reverse-engineered ClickHouse client :)
+
+.image go2.webm
+
+
+
+## ClickHouse Data Types
+* UInt8, UInt16, UInt32, UInt64, UInt128, UInt256
+* Enums
+* Int8, Int16, Int32, Int64, Int128, Int256
+* Date, Date32, DateTime, DateTime64
+* Decimal32, Decimal64, Decimal128, Decimal256
+* IPv4, IPv6
+* String, FixedString(N)
+* UUID
+* Point, Ring, Polygon, MultiPolygon
+
+## ClickHouse Data Types
+* Array(T)
+* LowCardinality(T)
+* Map(K, V)
+* Tuple(T1, T2, ..., Tn)
+* Nullable(T)
+
+
+## Generic Column Interface
+
+All other types implement this interface
+
+.code column_interface.go /COLUMN START/,/COLUMN END/
+
+## Base struct
+
+Use for All fixed size types
+
+.code base.go /BASE START/,/BASE END/
+
+
+## Big Integers
+
+.code uint.go /UINT START/,/UINT END/
+
+## Array
+
+.code array.go /ARRAY START/,/ARRAY END/
+
+
+## Date
+
+.code date.go /DATE START/,/DATE END/
+
+## Date
+
+.code date_type.go /DATE START/,/DATE END/
+
+
+
+## Read data
+Use `bufio` for read and write
+
+.code bufio.go /BUFIO START/,/BUFIO END/
+
+```
+producer   buffer       Reader
+
+abcd -----> abcd -----> a
+            abcd -----> b
+            abcd -----> c
+            abcd -----> d
+efgh -----> efgh -----> e
+            efgh -----> f
+            efgh -----> g
+            efgh -----> h
+ijkl -----> ijkl -----> i
+            ijkl -----> j
+```
+
+## Read data
+
+.code base.go /READ START/,/READ END/
+
+
+## Append Data
+
+.code base.go /WRITE START/,/WRITE END/
+
+
+## Write Data
+.code write.go /BUILD START/,/BUILD END/
+
+.code write.go /WRITE START/,/WRITE END/
+
+## Golang Optimizations
+## Memory allocation scenarios
+
+* declare variables
+* call the builtin new function.
+* call the builtin make function.
+* modify slices and maps with composite literals.
+* convert integers to strings.
+* concatenate strings by using use +.
+* convert between strings to byte slices, and vice versa.
+* convert strings to rune slices.
+* box values into interfaces (converting non-interface values into interfaces).
+* append elements to a slice and the capacity of the slice is not large enough.
+* put new entries into maps and the underlying array (to store entries) of the map is not large
+enough to store the new entries.
+
+## Memory waisting in golang
+* some memory block size classes(no more than 32768 bytes) are predefined
+* the smallest size classes are 8, 16, 24, 32, 48, 64, 80, 96, 112, 128  bytes.
+* Memory blocks larger than 32K bytes flip over to the "large
+allocation". The memory page size used by the official standard Go runtime (v1.18) is
+8K bytes.
+
+
+## Memory waisting in golang
+
+.code memory.go /MEMORY START/,/MEMORY END/
+
+## Heap and Stack
+
+.image heap.png
+
+
+## Escape analysis
+
+This works in Go
+
+.code escape.go
+
+But this is not work in c
+
+.code c/escape.c
+
+
+## Escape analysis
+
+.code escape2.go /ESCAPE START/,/ESCAPE END/
+
+.code escape2.out
+
+
+
+## Function inlining
+
+Use `go build -gcflags="-m -m" ` to check why func is inline-able or not
+
+* Should be simple enough, the number of AST nodes must less than the budget (80);
+* Doesn't contain complex things like closures, defer, recover, select, etc;
+* Isn't prefixed by go:noinline;
+* Isn't prefixed by go:uintptrescapes, since the escape information will be lost during inlining;
+
+
+## Unsafe Pointer
+
+Conversion Rules
+
+* A pointer value of any type can be converted to a Pointer.
+* A Pointer can be converted to a pointer value of any type.
+* A uintptr can be converted to a Pointer.
+* A Pointer can be converted to a uintptr.
+
+
+
+## Unsafe pointer- Pattern 1
+Conversion of a *T1 to Pointer to *T2.  
+
+T1 **MUST NOT** be smaller than T2
+
+.code unsafe.go /UNSAFE1 START/,/UNSAFE1 END/
+
+.code unsafe.go /UNSAFE12 START/,/UNSAFE12 END/
+
+## Unsafe pointer- Pattern 2
+
+Conversion of a Pointer to a uintptr (but not back to Pointer).
+
+.code unsafe.go /UNSAFE2 START/,/UNSAFE2 END/
+
+
+## Unsafe pointer- Pattern 3
+
+Conversion of a Pointer to a uintptr and back, with arithmetic.
+
+.code unsafe.go /UNSAFE3 START/,/UNSAFE3 END/
+
+.code unsafe.go /UNSAFE31 START/,/UNSAFE31 END/
+
+
+
+## Unsafe pointer- Pattern 4
+
+Conversion of a Pointer to a uintptr when calling syscall.Syscall
+
+
+.code unsafe.go /UNSAFE4 START/,/UNSAFE4 END/
+
+.code unsafe.go /UNSAFE41 START/,/UNSAFE41 END/
+
+.code unsafe.go /UNSAFE42 START/,/UNSAFE42 END/
+
+## Unsafe pointer- Pattern 5
+Conversion of the result of reflect.Value.Pointer or reflect.Value.UnsafeAddr from uintptr to Pointer.
+
+.code unsafe.go /UNSAFE5 START/,/UNSAFE5 END/
+
+## Unsafe pointer- Pattern 6
+
+Conversion of a reflect.SliceHeader or reflect.StringHeader Data field to or from Pointer.
+
+.code unsafe.go /UNSAFE6 START/,/UNSAFE6 END/
+
+
+## Unsafe pointer- Pattern 6
+
+.code unsafe.go /UNSAFE61 START/,/UNSAFE61 END/
+
+.code unsafe.go /UNSAFE62 START/,/UNSAFE62 END/
+
+.code unsafe.go /UNSAFE63 START/,/UNSAFE63 END/
+
+
+## Sample - Init
+
+.code chconn.go /CONNECT START/,/CONNECT END/
+
+## Sample - Define olumns
+
+.code chconn.go /COLUMN START/,/COLUMN END/
+
+## Sample - insert
+
+.code chconn.go /INSERT START/,/INSERT END/
+
+## Sample - Define select columns 
+
+.code chconn.go /COLUMNSEL START/,/COLUMNSEL END/
+
+## Sample - Select
+
+.code chconn.go /SELECT START/,/SELECT END/
+
+## Sample - Result
+
+.code chconn.go /RESULT START/,/RESULT END/
+
+
+## Benchmark
+
+
+
+```
+name \ time/op           chconn       chgo          go-clickhouse     uptrace
+TestSelect100MUint64-16   150ms ± 0%    154ms ± 0%       8019ms ± 0%       3045ms ± 0%
+TestSelect10MString-16    271ms ± 0%    447ms ± 0%        969ms ± 0%        822ms ± 0%
+TestInsert10M-16          198ms ± 0%    514ms ± 0%        561ms ± 0%        304ms ± 0%
+
+name \ alloc/op          chconn       chgo          go-clickhouse     uptrace
+TestSelect100MUint64-16   111kB ± 0%    262kB ± 0%    3202443kB ± 0%     800941kB ± 0%
+TestSelect10MString-16   1.63MB ± 0%   1.79MB ± 0%    1626.51MB ± 0%     241.03MB ± 0%
+TestInsert10M-16         26.0MB ± 0%  283.7MB ± 0%     1680.4MB ± 0%      240.2MB ± 0%
+
+name \ allocs/op         chconn       chgo          go-clickhouse     uptrace
+TestSelect100MUint64-16    35.0 ± 0%   6683.0 ± 0%  200030937.0 ± 0%  100006069.0 ± 0%
+TestSelect10MString-16     49.0 ± 0%   1748.0 ± 0%   30011991.0 ± 0%   20001120.0 ± 0%
+TestInsert10M-16           26.0 ± 0%     80.0 ± 0%        224.0 ± 0%         50.0 ± 0%
+```
+

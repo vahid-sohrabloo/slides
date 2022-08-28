@@ -1,0 +1,6 @@
+go run -gcflags=-m escape.go
+# command-line-arguments
+./escape.go:10:5: can inline main.func1
+./escape.go:6:3: moved to heap: a
+./escape.go:10:5: func literal escapes to heap
+1 false
