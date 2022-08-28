@@ -188,6 +188,12 @@ But this is not work in c
 .code escape2.out
 
 
+* Allocate tips
+- Pre-allocate all memory needs at once
+- Reuse allocated variables
+ 
+.code base.go /BUFFER START/,/BUFFER END/
+
 
 * Function inlining
 
@@ -267,28 +273,29 @@ Conversion of a reflect.SliceHeader or reflect.StringHeader Data field to or fro
 
 .code unsafe.go /UNSAFE63 START/,/UNSAFE63 END/
 
+* Now an example…
 
-* Sample - Init
+* Example - Init
 
 .code chconn.go /CONNECT START/,/CONNECT END/
 
-* Sample - Define columns
+* Example - Define columns
 
 .code chconn.go /COLUMN START/,/COLUMN END/
 
-* Sample - insert
+* Example - insert
 
 .code chconn.go /INSERT START/,/INSERT END/
 
-* Sample - Define select columns 
+* Example - Define select columns 
 
 .code chconn.go /COLUMNSEL START/,/COLUMNSEL END/
 
-* Sample - Select
+* Example - Select
 
 .code chconn.go /SELECT START/,/SELECT END/
 
-* Sample - Result
+* Example - Result
 
 .code chconn.go /RESULT START/,/RESULT END/
 

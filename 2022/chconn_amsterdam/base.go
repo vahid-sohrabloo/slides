@@ -47,3 +47,17 @@ func (c *Base[T]) Append(v ...T) {
 }
 
 // WRITE END OMIT
+
+// BUFFER START OMIT
+func (c *Base[T]) SetWriteBufferSize(row int) {
+	if cap(c.values) < row {
+		c.values = make([]T, 0, row)
+	}
+}
+
+func (c *Base[T]) Reset() {
+	c.numRow = 0
+	c.values = c.values[:0]
+}
+
+// BUFFER END OMIT
