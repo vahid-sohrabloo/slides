@@ -1,5 +1,5 @@
-chconn Making a high performance generic library
-31 Aug 2022
+chconn -Making a high performance generic library
+30 Aug 2022
 Tags: golang, clickhouse, chconn, generic
 
 Vahid Sohbraloo
@@ -10,14 +10,14 @@ https://github.com/vahid-sohrabloo/chconn
 : chconn is the high performance ClickHouse driver
 
 * What is ClickHouse
-The Open Source OLAP database management system.
+- The Open Source OLAP database management system.
 - Blazing fast
 - Linearly scalable
 - Fault tolerant
 - ...
 
 
-* Why new a driver
+* Why new a driver  
 - Looking for Time Series database
 - Clickhouse is very fast
 - Native driver was really slow
@@ -36,14 +36,16 @@ The Open Source OLAP database management system.
 - *Use* *Little* *Endian*
 - Use CityHash (the old version)
 - LZ4 and ZSTD compression
-- 
+- ...
+
 * Document of TCP interface
+ 
  Haa...
- ```
- native ClickHouse protocol does not have formal specification yet,
- but it can be reverse-engineered from ClickHouse source code
- and/or by intercepting and analyzing TCP traffic.
-```
+ 
+Native ClickHouse protocol does not have formal specification yet,
+but it can be reverse-engineered from ClickHouse source code
+and/or by intercepting and analyzing TCP traffic.
+
 After I started, some documents were added.
 It is not complete and is not updated in every version
 
