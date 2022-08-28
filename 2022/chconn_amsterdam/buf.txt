@@ -1,0 +1,13 @@
+producer   buffer       Reader
+
+abcd -----> abcd -----> a
+            abcd -----> b
+            abcd -----> c
+            abcd -----> d
+efgh -----> efgh -----> e
+            efgh -----> f
+            efgh -----> g
+            efgh -----> h
+ijkl -----> ijkl -----> i
+            ijkl -----> j
+`
