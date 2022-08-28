@@ -10,4 +10,3 @@ efgh -----> efgh -----> e
             efgh -----> h
 ijkl -----> ijkl -----> i
             ijkl -----> j
-`

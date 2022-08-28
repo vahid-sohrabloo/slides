@@ -43,7 +43,7 @@ func Insert() {
 	// COLUMN START OMIT
 	col1 := column.New[uint64]()
 	col2 := column.New[uint64]().Nullable()
-	rows := 1_000_0000 // One hundred million rows- insert in 10 times
+	rows := 1_000_0000 // One million rows- insert in 10 times
 	numInsert := 10
 	col1.SetWriteBufferSize(rows)
 	col2.SetWriteBufferSize(rows)

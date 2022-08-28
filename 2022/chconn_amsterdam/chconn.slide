@@ -1,4 +1,4 @@
-chconn -Making a high performance generic library
+chconn - making a high performance generic library for Clickhouse
 30 Aug 2022
 Tags: golang, clickhouse, chconn, generic
 
@@ -17,7 +17,7 @@ https://github.com/vahid-sohrabloo/chconn
 - ...
 
 
-* Why new a driver  
+* Why a new driver?  
 - Looking for Time Series database
 - Clickhouse is very fast
 - Native driver was really slow
@@ -40,7 +40,7 @@ https://github.com/vahid-sohrabloo/chconn
 
 * Document of TCP interface
  
- Haa...
+Haa...
  
 Native ClickHouse protocol does not have formal specification yet,
 but it can be reverse-engineered from ClickHouse source code

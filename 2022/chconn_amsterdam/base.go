@@ -21,23 +21,16 @@ func New[T comparable]() *Base[T] {
 
 // BASE END OMIT
 
-// Data get all the data in current block as a slice.
-//
-// NOTE: the return slice only valid in current block, if you want to use it after, you should copy it. or use Read
 // READ START OMIT
 func (c *Base[T]) Data() []T {
 	value := *(*[]T)(unsafe.Pointer(&c.b))
 	return value[:c.numRow]
 }
 
-// Read reads all the data in current block and append to the input.
 func (c *Base[T]) Read(value []T) []T {
-	v := *(*[]T)(unsafe.Pointer(&c.b))
-	return append(value, v[:c.numRow]...)
+	return append(value, c.Data()...)
 }
 
-// Row return the value of given row.
-// NOTE: Row number start from zero
 func (c *Base[T]) Row(row int) T {
 	i := row * c.size
 	return *(*T)(unsafe.Pointer(&c.b[i]))
@@ -48,16 +41,7 @@ func (c *Base[T]) Row(row int) T {
 // WRITE START OMIT
 
 // Append value for insert
-func (c *Base[T]) Append(v T) {
-	c.numRow++
-	c.values = append(c.values, v)
-}
-
-// AppendSlice append slice of value for insert
-func (c *Base[T]) AppendSlice(v []T) {
-	if len(v) == 0 {
-		return
-	}
+func (c *Base[T]) Append(v ...T) {
 	c.values = append(c.values, v...)
 	c.numRow += len(v)
 }
