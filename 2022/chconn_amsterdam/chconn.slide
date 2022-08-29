@@ -116,29 +116,6 @@ Use for All fixed size types
 
 
 
-* Read data
-Use `bufio` for read and write
-
-.code bufio.go /BUFIO START/,/BUFIO END/
-
-.code buf.txt
-
-
-
-* Read data
-
-.code base.go /READ START/,/READ END/
-
-
-* Append Data
-
-.code base.go /WRITE START/,/WRITE END/
-
-
-* Write Data
-.code write.go /BUILD START/,/BUILD END/
-
-.code write.go /WRITE START/,/WRITE END/
 
 * Golang Optimizations
 * Memory allocation scenarios
@@ -272,6 +249,33 @@ Conversion of a reflect.SliceHeader or reflect.StringHeader Data field to or fro
 .code unsafe.go /UNSAFE62 START/,/UNSAFE62 END/
 
 .code unsafe.go /UNSAFE63 START/,/UNSAFE63 END/
+
+
+
+* Read data
+Use `bufio` for read and write
+
+.code bufio.go /BUFIO START/,/BUFIO END/
+
+.code buf.txt
+
+
+
+* Read data
+
+.code base.go /READ START/,/READ END/
+
+
+* Append Data
+
+.code base.go /WRITE START/,/WRITE END/
+
+
+* Write Data
+.code write.go /BUILD START/,/BUILD END/
+
+.code write.go /WRITE START/,/WRITE END/
+
 
 * Now an example…
 
